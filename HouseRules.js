@@ -87,8 +87,8 @@ function onIntent(intentRequest, session, callback) {
         setHouseRuleInSession(intent, session, callback);
     } else if ("ListHouseRules" === intentName) {
         listHouseRulesFromSession(intent, session, callback);
-    } else if ("DeleteHouseRulesAbout" === intentName) {
-        deleteHouseRulesAbout(intent, session, callback);
+    } else if ("DeleteHouseRuleAbout" === intentName) {
+        deleteHouseRuleAbout(intent, session, callback);
     } else if ("DeleteAllHouseRules" === intentName) {
         deleteAllHouseRules(intent, session, callback);
     } else if ("AMAZON.HelpIntent" === intentName) {
@@ -202,28 +202,61 @@ function deleteAllHouseRules(intent, session, callback) {
     callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
-function deleteHouseRulesAbout(intent, session, callback) {
+function deleteHouseRuleAbout(intent, session, callback) {
     var cardTitle = intent.name;
+    var newRuleContentSlot = intent.slots.RuleContent;
+
     var repromptText = "";
-    var shouldEndSession = true;
+    var shouldEndSession = false;
     var speechOutput = "";
 
     loadUserData(session, function(userData) {
         var houseRules = userData.houseRules;
 
-        console.log(userData)
-        if (houseRules && houseRules.length) {
+        var matchingHouseRuleIndexes = [];
+
+        if (houseRules && houseRules.length && newRuleContentSlot && newRuleContentSlot.length) {
             for (var i = 0; i < houseRules.length; i++ ) {
-                houseRulesString += (i+1) + '. ' + houseRules[i] + ". ";
+                if (houseRules[i].indexOf(newRuleContentSlot) > -1) {
+                    matchingHouseRuleIndexes.push(i);
+                }
             }
 
+            if( matchingHouseRuleIndexes.length === 0 ) {
+                // no matches
+                speechOutput = "No rule about '"+ newRuleContentSlot + "'. You can say, " +
+                    "delete house rule about jumping on the bed";
+                repromptText = "You can say, delete house rule about jumping on the bed";
+            } else if (matchingHouseRuleIndexes.length > 1 ) {
+                // too many matches
+                speechOutput = "Too many house rules about '"+ newRuleContentSlot + "'. You can say, " +
+                    "delete house rule about jumping on the bed";
+                repromptText = "You can say, delete house rule about jumping on the bed";
+            } else {
+                // found one; delete it!
+                houseRules = houseRules.splice(matchingHouseRuleIndexes[0], 1);
+
+                shouldEndSession = true;
+                speechOutput = "Removed rule about '"+ newRuleContentSlot + "'. You can say, " +
+                    "list house rules";
+                repromptText = "You can say, delete house rule about jumping on the bed";
+            }
+
+            sessionAttributes = createHouseRulesAttribute(houseRules);
+
+            saveUserData(session.user.userId, sessionAttributes, function(err, data) {});
+
         } else {
-            
+            speechOutput = "I'm not sure which rule to delete. Please try again";
+            repromptText = "I'm not sure which rule to delete. You can delete a rule by saying, " +
+                "delete house rule about jumping on the bed";
         }
+
+        callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
     });
 
 
-            session.attributes = {};
+    session.attributes = {};
 
     saveUserData(session.user.userId, session.attributes, function(err, data) {});
 
