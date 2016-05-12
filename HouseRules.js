@@ -81,6 +81,8 @@ function onIntent(intentRequest, session, callback) {
 
     var intent = intentRequest.intent,
         intentName = intentRequest.intent.name;
+        
+    console.log(intentName);
 
     // Dispatch to your skill's intent handlers
     if ("SetHouseRule" === intentName) {
@@ -148,11 +150,12 @@ function setHouseRuleInSession(intent, session, callback) {
     var shouldEndSession = false;
     var speechOutput = "";
     
-    if (newHouseRuleSlot && newHouseRule !== 'house rule' && newHouseRule !== 'house rule ') {
+    if (newHouseRuleSlot && newHouseRuleSlot.value !== 'nonexistent' && newHouseRuleSlot.value !== 'nonexistent ') {
+        var newHouseRule = newHouseRuleSlot.value.replace('house rule ', '');
+
         loadUserData(session, function(userData) {
             var houseRules = userData.houseRules || [];
 
-            var newHouseRule = newHouseRuleSlot.value.replace('house rule ', '');
 
             houseRules.unshift(newHouseRule);
 
@@ -215,56 +218,51 @@ function deleteHouseRuleAbout(intent, session, callback) {
 
         var matchingHouseRuleIndexes = [];
 
-        if (houseRules && houseRules.length && newRuleContentSlot && newRuleContentSlot.length) {
+        if (houseRules && houseRules.length && newRuleContentSlot && newRuleContentSlot.value.length && newRuleContentSlot.value !== 'nonexistent' && newRuleContentSlot.value !== 'nonexistent ') {
             for (var i = 0; i < houseRules.length; i++ ) {
-                if (houseRules[i].indexOf(newRuleContentSlot) > -1) {
+                if (houseRules[i].indexOf(newRuleContentSlot.value.trim()) > -1) {
                     matchingHouseRuleIndexes.push(i);
                 }
             }
 
             if( matchingHouseRuleIndexes.length === 0 ) {
                 // no matches
-                speechOutput = "No rule about '"+ newRuleContentSlot + "'. You can say, " +
+                console.log('no matches');
+                speechOutput = "No rule about '"+ newRuleContentSlot.value + "'. You can say, " +
                     "delete house rule about jumping on the bed";
                 repromptText = "You can say, delete house rule about jumping on the bed";
             } else if (matchingHouseRuleIndexes.length > 1 ) {
                 // too many matches
-                speechOutput = "Too many house rules about '"+ newRuleContentSlot + "'. You can say, " +
+                console.log('too many matches');
+                speechOutput = "Too many house rules about '"+ newRuleContentSlot.value + "'. You can say, " +
                     "delete house rule about jumping on the bed";
                 repromptText = "You can say, delete house rule about jumping on the bed";
             } else {
                 // found one; delete it!
-                houseRules = houseRules.splice(matchingHouseRuleIndexes[0], 1);
+                console.log('found one:' + matchingHouseRuleIndexes[0] + ', delete it!');
+                var oldRule = houseRules[matchingHouseRuleIndexes[0]];
 
+                houseRules.splice(matchingHouseRuleIndexes[0], 1);
+                session.attributes.houseRules = houseRules;
+                
                 shouldEndSession = true;
-                speechOutput = "Removed rule about '"+ newRuleContentSlot + "'. You can say, " +
+                speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
                     "list house rules";
                 repromptText = "You can say, delete house rule about jumping on the bed";
             }
 
-            sessionAttributes = createHouseRulesAttribute(houseRules);
 
-            saveUserData(session.user.userId, sessionAttributes, function(err, data) {});
+            saveUserData(session.user.userId, session.attributes, function(err, data) {});
 
         } else {
+            console.log('slot or rules are bad');
             speechOutput = "I'm not sure which rule to delete. Please try again";
             repromptText = "I'm not sure which rule to delete. You can delete a rule by saying, " +
                 "delete house rule about jumping on the bed";
         }
 
-        callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+        callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
     });
-
-
-    session.attributes = {};
-
-    saveUserData(session.user.userId, session.attributes, function(err, data) {});
-
-    speechOutput = "Deleted all house rules. You can say, " +
-        "new house rule no monkeys jumping on the bed";
-    repromptText = "You can say, new house rule no monkeys jumping on the bed";
-            
-    callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
 function listHouseRulesFromSession(intent, session, callback) {
