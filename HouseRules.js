@@ -205,6 +205,48 @@ function deleteAllHouseRules(intent, session, callback) {
     callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
+function deleteHouseRuleNumber(intent, session, callback) {
+    var cardTitle = intent.name;
+    var newRuleNumberSlot = intent.slots.RuleNumber;
+
+    var repromptText = "";
+    var shouldEndSession = false;
+    var speechOutput = "";
+
+    loadUserData(session, function(userData) {
+        var houseRules = userData.houseRules;
+
+        var matchingHouseRuleIndexes = [];
+
+        if (houseRules && houseRules.length && newRuleNumberSlot 
+            && newRuleNumberSlot.value && houseRules[newRuleNumberSlot.value - 1]) {
+        
+            // found one; delete it!
+            console.log('found rule number:' + newRuleNumberSlot.value + ', delete it!');
+            var oldRule = houseRules[newRuleNumberSlot.value - 1];
+
+            houseRules.splice(newRuleNumberSlot.value - 1, 1);
+            session.attributes.houseRules = houseRules;
+            
+            shouldEndSession = true;
+            speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
+                "list house rules";
+            repromptText = "You can say, list house rules";
+
+            saveUserData(session.user.userId, session.attributes, function(err, data) {});
+
+        } else {
+            console.log('slot or rules are bad');
+            speechOutput = "I'm not sure which rule to delete. Please try again";
+            repromptText = "I'm not sure which rule to delete. You can delete a rule by saying, " +
+                "delete house rule number five";
+        }
+
+        callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+    });
+}
+
+
 function deleteHouseRuleAbout(intent, session, callback) {
     var cardTitle = intent.name;
     var newRuleContentSlot = intent.slots.RuleContent;
@@ -248,7 +290,7 @@ function deleteHouseRuleAbout(intent, session, callback) {
                 shouldEndSession = true;
                 speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
                     "list house rules";
-                repromptText = "You can say, delete house rule about jumping on the bed";
+                repromptText = "You can say, list house rules";
             }
 
 
