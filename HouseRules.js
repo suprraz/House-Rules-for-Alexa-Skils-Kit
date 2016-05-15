@@ -89,6 +89,8 @@ function onIntent(intentRequest, session, callback) {
         setHouseRuleInSession(intent, session, callback);
     } else if ("ListHouseRules" === intentName) {
         listHouseRulesFromSession(intent, session, callback);
+    } else if ("DeleteHouseRuleNumber" === intentName) {
+        deleteHouseRuleNumber(intent, session, callback);
     } else if ("DeleteHouseRuleAbout" === intentName) {
         deleteHouseRuleAbout(intent, session, callback);
     } else if ("DeleteAllHouseRules" === intentName) {
@@ -119,11 +121,11 @@ function getWelcomeResponse(callback) {
     var sessionAttributes = {};
     var cardTitle = "Welcome";
     var speechOutput = "Welcome to House Rules. " +
-        "Please tell me a house rule by saying, new house rule no monkeys jumping on the bed";
+        "Please tell me a house rule by saying, new rule no monkeys jumping on the bed";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "Please tell me a house rule by saying, " +
-        "new house rule no monkeys jumping on the bed";
+        "new rule no monkeys jumping on the bed";
     var shouldEndSession = false;
 
     callback(sessionAttributes,
@@ -132,7 +134,7 @@ function getWelcomeResponse(callback) {
 
 function handleSessionEndRequest(callback) {
     var cardTitle = "Session Ended";
-    var speechOutput = "Thank you for trying House Rules. Have a nice day!";
+    var speechOutput = "Have a nice day!";
     // Setting this to true ends the session and exits the skill.
     var shouldEndSession = true;
 
@@ -164,15 +166,15 @@ function setHouseRuleInSession(intent, session, callback) {
             saveUserData(session.user.userId, sessionAttributes, function(err, data) {});
 
             speechOutput = "I now added house rule " + newHouseRule + ". You can ask me " +
-                "your list of rules by saying, what are the house rules?";
-            repromptText = "You can ask me your list of rules by saying, what are the house rules?";
+                "your list of rules by saying, list rules";
+            repromptText = "You can ask me your list of rules by saying, list rules?";
                     
             callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 
         });
     } else {
-        speechOutput = "I'm not sure what your new house rule is. Please try again";
-        repromptText = "I'm not sure what your new house rule is. You can tell me your " +
+        speechOutput = "I didn't understand your new house rule. Please try again";
+        repromptText = "I didn't understand your new house rule. You can tell me your " +
             "house rules by saying, new house rule no monkeys jumping on the bed";
 
         callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
@@ -298,9 +300,9 @@ function deleteHouseRuleAbout(intent, session, callback) {
 
         } else {
             console.log('slot or rules are bad');
-            speechOutput = "I'm not sure which rule to delete. Please try again";
-            repromptText = "I'm not sure which rule to delete. You can delete a rule by saying, " +
-                "delete house rule about jumping on the bed";
+            speechOutput = "I'm not sure which rule to remove. Please try again";
+            repromptText = "I'm not sure which rule to remove. You can delete a rule by saying, " +
+                "delete rule about jumping on the bed";
         }
 
         callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
@@ -325,8 +327,8 @@ function listHouseRulesFromSession(intent, session, callback) {
             speechOutput = "Your house rules are: " + houseRulesString +  "Goodbye.";
             shouldEndSession = true;
         } else {
-            speechOutput = "I'm not sure what your house rules are, you can say, " +
-                "new house rule no monkeys jumping on the bed";
+            speechOutput = "You haven't set any house rules, you can say, " +
+                "new rule no monkeys jumping on the bed";
         }
 
         // Setting repromptText to null signifies that we do not want to reprompt the user.
