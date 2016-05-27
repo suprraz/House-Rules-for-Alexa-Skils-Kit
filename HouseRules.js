@@ -96,7 +96,7 @@ function onIntent(intentRequest, session, callback) {
     } else if ("DeleteAllHouseRules" === intentName) {
         deleteAllHouseRules(intent, session, callback);
     } else if ("AMAZON.HelpIntent" === intentName) {
-        getWelcomeResponse(callback);
+        getHelp(callback);
     } else if ("AMAZON.StopIntent" === intentName || "AMAZON.CancelIntent" === intentName) {
         handleSessionEndRequest(callback);
     } else {
@@ -132,6 +132,20 @@ function getWelcomeResponse(callback) {
         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
+function getHelp(callback) {
+    // If we wanted to initialize the session to have some attributes we could add those here.
+    var sessionAttributes = {};
+    var cardTitle = "Help";
+    var speechOutput = "Have Alexa recite your house rules! " + 
+      "  Simply set your rules and the next time there is an argument to be settled, ask Alexa. ";
+    var repromptText = "Please tell me a house rule by saying, " +
+        "new rule no monkeys jumping on the bed";
+    var shouldEndSession = false;
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
 function handleSessionEndRequest(callback) {
     var cardTitle = "Session Ended";
     var speechOutput = "Have a nice day!";
@@ -141,6 +155,7 @@ function handleSessionEndRequest(callback) {
     callback({}, buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
+/**
 /**
  * Sets the house rules in the session and prepares the speech to reply to the user.
  */
@@ -193,7 +208,7 @@ function createHouseRulesAttribute(houseRules) {
 function deleteAllHouseRules(intent, session, callback) {
     var cardTitle = intent.name;
     var repromptText = "";
-    var shouldEndSession = true;
+    var shouldEndSession = false;
     var speechOutput = "";
 
     session.attributes = {};
@@ -230,7 +245,6 @@ function deleteHouseRuleNumber(intent, session, callback) {
             houseRules.splice(newRuleNumberSlot.value - 1, 1);
             session.attributes.houseRules = houseRules;
             
-            shouldEndSession = true;
             speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
                 "list house rules";
             repromptText = "You can say, list house rules";
@@ -289,7 +303,6 @@ function deleteHouseRuleAbout(intent, session, callback) {
                 houseRules.splice(matchingHouseRuleIndexes[0], 1);
                 session.attributes.houseRules = houseRules;
                 
-                shouldEndSession = true;
                 speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
                     "list house rules";
                 repromptText = "You can say, list house rules";
@@ -324,7 +337,7 @@ function listHouseRulesFromSession(intent, session, callback) {
             for (var i = 0; i < houseRules.length; i++ ) {
                 houseRulesString += (i+1) + '. ' + houseRules[i] + ". ";
             }
-            speechOutput = "Your house rules are: " + houseRulesString +  "Goodbye.";
+            speechOutput = "Your house rules are: " + houseRulesString;
             shouldEndSession = true;
         } else {
             speechOutput = "You haven't set any house rules, you can say, " +
@@ -349,8 +362,8 @@ function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
         },
         card: {
             type: "Simple",
-            title: "SessionSpeechlet - " + title,
-            content: "SessionSpeechlet - " + output
+            title: "houseRules - " + title,
+            content: "houseRules - " + output
         },
         reprompt: {
             outputSpeech: {
