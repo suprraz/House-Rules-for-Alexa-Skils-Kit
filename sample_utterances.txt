@@ -1,3 +1,4 @@
+SetHouseRule set rule {no t. v. on weekdays|HouseRule}
 SetHouseRule set rule {nonexistent variable length string|HouseRule}
 SetHouseRule new rule {nonexistent variable length string|HouseRule}
 SetHouseRule add rule {nonexistent variable length string|HouseRule}
