@@ -22,11 +22,11 @@ exports.handler = function (event, context) {
          * Uncomment this if statement and populate with your skill's application ID to
          * prevent someone else from configuring a skill that sends requests to this function.
          */
-        
+
         if (event.session.application.applicationId !== "amzn1.echo-sdk-ams.app.a030169e-8615-4672-bef2-e40ac20de322") {
-             context.fail("Invalid Application ID");
+            context.fail("Invalid Application ID");
         }
-        
+
 
         if (event.session.new) {
             onSessionStarted({requestId: event.request.requestId}, event.session);
@@ -81,7 +81,7 @@ function onIntent(intentRequest, session, callback) {
 
     var intent = intentRequest.intent,
         intentName = intentRequest.intent.name;
-        
+
     console.log(intentName);
 
     // Dispatch to your skill's intent handlers
@@ -136,8 +136,8 @@ function getHelp(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     var sessionAttributes = {};
     var cardTitle = "Help";
-    var speechOutput = "Have Alexa recite your house rules! " + 
-      "  Simply set your rules and the next time there is an argument to be settled, ask Alexa. ";
+    var speechOutput = "Have Alexa recite your house rules! " +
+        "  Simply set your rules and the next time there is an argument to be settled, ask Alexa. ";
     var repromptText = "Please tell me a house rule by saying, " +
         "new rule no monkeys jumping on the bed";
     var shouldEndSession = false;
@@ -156,7 +156,6 @@ function handleSessionEndRequest(callback) {
 }
 
 /**
-/**
  * Sets the house rules in the session and prepares the speech to reply to the user.
  */
 function setHouseRuleInSession(intent, session, callback) {
@@ -166,7 +165,7 @@ function setHouseRuleInSession(intent, session, callback) {
     var sessionAttributes = {};
     var shouldEndSession = false;
     var speechOutput = "";
-    
+
     if (newHouseRuleSlot && newHouseRuleSlot.value !== 'nonexistent' && newHouseRuleSlot.value !== 'nonexistent ') {
         var newHouseRule = newHouseRuleSlot.value.replace('house rule ', '');
 
@@ -183,7 +182,7 @@ function setHouseRuleInSession(intent, session, callback) {
             speechOutput = "I now added house rule " + newHouseRule + ". You can ask me " +
                 "your list of rules by saying, list rules";
             repromptText = "You can ask me your list of rules by saying, list rules?";
-                    
+
             callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 
         });
@@ -195,7 +194,7 @@ function setHouseRuleInSession(intent, session, callback) {
         callback(sessionAttributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
     }
 
-    
+
 }
 
 function createHouseRulesAttribute(houseRules) {
@@ -218,7 +217,7 @@ function deleteAllHouseRules(intent, session, callback) {
     speechOutput = "Deleted all house rules. You can say, " +
         "new house rule no monkeys jumping on the bed";
     repromptText = "You can say, new house rule no monkeys jumping on the bed";
-            
+
     callback(session.attributes, buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
@@ -235,16 +234,16 @@ function deleteHouseRuleNumber(intent, session, callback) {
 
         var matchingHouseRuleIndexes = [];
 
-        if (houseRules && houseRules.length && newRuleNumberSlot 
+        if (houseRules && houseRules.length && newRuleNumberSlot
             && newRuleNumberSlot.value && houseRules[newRuleNumberSlot.value - 1]) {
-        
+
             // found one; delete it!
             console.log('found rule number:' + newRuleNumberSlot.value + ', delete it!');
             var oldRule = houseRules[newRuleNumberSlot.value - 1];
 
             houseRules.splice(newRuleNumberSlot.value - 1, 1);
             session.attributes.houseRules = houseRules;
-            
+
             speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
                 "list house rules";
             repromptText = "You can say, list house rules";
@@ -302,7 +301,7 @@ function deleteHouseRuleAbout(intent, session, callback) {
 
                 houseRules.splice(matchingHouseRuleIndexes[0], 1);
                 session.attributes.houseRules = houseRules;
-                
+
                 speechOutput = "Removed rule '"+ oldRule + "'. You can say, " +
                     "list house rules";
                 repromptText = "You can say, list house rules";
@@ -326,7 +325,7 @@ function listHouseRulesFromSession(intent, session, callback) {
     var repromptText = null;
     var shouldEndSession = false;
     var speechOutput = "";
-    
+
     console.log('loading User Data');
     loadUserData(session, function(userData) {
         var houseRules = userData.houseRules;
@@ -348,7 +347,7 @@ function listHouseRulesFromSession(intent, session, callback) {
         // If the user does not respond or says something that is not understood, the session
         // will end.
         callback(session.attributes,
-             buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
+            buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
     });
 }
 
@@ -387,7 +386,7 @@ function buildResponse(sessionAttributes, speechletResponse) {
 // ------------------ DynamoDB Storage ----------------------
 
 
- function saveUserData (userId, userData, callback) {
+function saveUserData (userId, userData, callback) {
     dynamodb.putItem({
         TableName: 'HouseRulesUserData',
         Item: {
@@ -413,7 +412,7 @@ function loadUserData(session, callback) {
     if(typeof session.attributes === "undefined") {
         session.attributes = {};
     }
-    
+
     if (session.attributes && session.attributes.houseRules) {
         console.log('get houseRules from session=' + session.attributes);
         callback(session.attributes);
@@ -431,15 +430,15 @@ function loadUserData(session, callback) {
         if (err) {
             console.log(err, err.stack);
             session.attributes.houseRules = houseRules;
-            callback(session.attribute);
+            callback(session.attributes);
         } else if (data.Item === undefined) {
             session.attributes.houseRules = houseRules;
-            callback(session.attribute);
+            callback(session.attributes);
         } else {
             console.log('get houseRules from dynamodb=' + data.Item.Data.S);
             userData = JSON.parse(data.Item.Data.S);
-            session.attribute = userData;
-            callback(session.attribute);
+            session.attributes = userData;
+            callback(session.attributes);
         }
     });
 }

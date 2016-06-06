@@ -33,7 +33,6 @@ ListHouseRules list house rules
 ListHouseRules house rules
 ListHouseRules what are the house rules
 ListHouseRules recite rules
-ListHouseRules house rules
 
 DeleteAllHouseRules Delete all house rules
 DeleteAllHouseRules Delete all rules
