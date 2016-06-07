@@ -29,43 +29,28 @@ ListHouseRules list rules
 ListHouseRules list
 ListHouseRules rules
 ListHouseRules what are the rules
-ListHouseRules list house rules
-ListHouseRules house rules
-ListHouseRules what are the house rules
 ListHouseRules recite rules
 
-DeleteAllHouseRules Delete all house rules
 DeleteAllHouseRules Delete all rules
 DeleteAllHouseRules Delete all
 
-DeleteAllHouseRules Remove all house rules
 DeleteAllHouseRules Remove all rules
 DeleteAllHouseRules Remove all
 
-DeleteHouseRuleAbout Delete house rule about {nonexistent variable length string|RuleContent}
 DeleteHouseRuleAbout Delete rule about {nonexistent variable length string|RuleContent}
 DeleteHouseRuleAbout Delete the one about {nonexistent variable length string|RuleContent}
 DeleteHouseRuleAbout Delete the rule about {nonexistent variable length string|RuleContent}
-DeleteHouseRuleAbout Delete the house rule about {nonexistent variable length string|RuleContent}
-DeleteHouseRuleAbout Delete house rule about {nonexistent|RuleContent}
 DeleteHouseRuleAbout Delete rule about {nonexistent|RuleContent}
 DeleteHouseRuleAbout Delete the one about {nonexistent|RuleContent}
 DeleteHouseRuleAbout Delete the rule about {nonexistent|RuleContent}
-DeleteHouseRuleAbout Delete the house rule about {nonexistent|RuleContent}
 
-DeleteHouseRuleAbout Remove house rule about {nonexistent variable length string|RuleContent}
 DeleteHouseRuleAbout Remove rule about {nonexistent variable length string|RuleContent}
 DeleteHouseRuleAbout Remove the one about {nonexistent variable length string|RuleContent}
 DeleteHouseRuleAbout Remove the rule about {nonexistent variable length string|RuleContent}
-DeleteHouseRuleAbout Remove the house rule about {nonexistent variable length string|RuleContent}
-DeleteHouseRuleAbout Remove house rule about {nonexistent|RuleContent}
 DeleteHouseRuleAbout Remove rule about {nonexistent|RuleContent}
 DeleteHouseRuleAbout Remove the one about {nonexistent|RuleContent}
 DeleteHouseRuleAbout Remove the rule about {nonexistent|RuleContent}
-DeleteHouseRuleAbout Remove the house rule about {nonexistent|RuleContent}
 
-DeleteHouseRuleNumber Delete house rule number {RuleNumber}
 DeleteHouseRuleNumber Delete rule number {RuleNumber}
 
-DeleteHouseRuleNumber Remove house rule number {RuleNumber}
 DeleteHouseRuleNumber Remove rule number {RuleNumber}
